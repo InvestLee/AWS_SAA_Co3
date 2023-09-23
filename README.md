@@ -208,3 +208,10 @@ ex 5. 분산 파일 시스템
 - 80 = HTTP - access unsecured websites
 - 443 = HTTPS - access secured websites
 - 3389 = RDP (Remote Desktop Protocal) - log into a Windows instance
+
+[SSH]
+- 클라우스에서 실행 시 유지 보수나 조치를 취하기 위해 서버 내부와 연결해야됨
+- Linux 서버에서는 시큐어 셸인 SSH를 서버에 사용
+- SSH는 명령줄 인터페이스 도구로 Mac, Linux, 윈도우10 이상에서 사용가능
+- 윈도우 10미만은 putty사용
+- EC2 Instance Connect는 터미널, putty가 아닌 웹 브라우저로 EC2 인스턴스에 연결

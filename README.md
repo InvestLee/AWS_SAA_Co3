@@ -722,3 +722,43 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 - 소스는 IP범위가 아니라 보안그룹이 됨
 - EC2 인스턴스의 보안 그룹을 로드 밸런서의 보안 그룹으로 연결
 - EC2 인스턴스는 로드 밸런서에서 온 트래픽 만을 허용하게 되는 강화된 보안 메커니즘이 됨
+
+[Application Load Balancer(ALB)]
+- 7계층, 즉 HTTP 전용 로드 밸런서
+- 머신 간 다수 HTTP 애플리케이션의 라우팅에 사용
+- 이러한 머신들은 target group이라는 그룹으로 묶이게 됨
+- 동일 EC2 인스턴스 상의 여러 애플리케이션에 부하를 분산(ex. 컨테이너, ECS)
+- HTTP/2, WebSocket 및 리다이렉트 지원
+- HTTP에서 HTTPS로 트래픽을 자동 리다이렉트하려는 경우 로드밸런서 레벨에서 가능
+- 경로 라우팅도 지원
+1. target group에 따른 라우팅으로는 예를 들면, URL target route에 기반한 라우팅 가능(example.com/users or example.com/posts)
+2. /users와 posts는 URL 상의 서로 다른 경로이고 이들은 다른 target group에 리다이렉트 가능
+3. URL의 호스트 이름에 기반한 라우팅로 가능
+4. 로드 밸런서가 one.example.com 또는 other.example.com에 접근이 가능하다고 하면 두 개의 다른 대상 그룹에 라우팅 가능
+5. 쿼리 문자열과 헤더에 기반한 라우팅 가능(example.com/users?id=123&order=false가 다른 target group에 라우팅 가능)
+- ALB는 마이크로 서비스나 컨테이너 기반 애플리케이션에 가장 좋은 로드 밸런서로 도커와 Amazon ECS의 경우 ALB가 가장 적합한 로드 밸런서가 됨
+- 왜나하면 포트 매핑 기능이 있어 ECS 인스턴스의 동적 포트로의 리다이렉션을 가능하게 해줌
+- CLB 뒤에서 다수의 애플리케이션을 사용하는 경우 실제 애플리케이션 개수만큼의 CLB가 필요
+- ALB는 하나만으로 다수의 애플리케이션을 처리할 수 있음
+
+[ALB Target Group]
+- EC2 인스턴스
+1. HTTP
+2. 오토 스케일링 그룹에 의해 관리될 수 있음
+- ECS 작업
+1. HTTP
+- 람다 함수
+1. HTTP 요청이 JSON으로 변환됨
+2. 람다함수는 AWS에서 무서버로 불리는 모든 것들의 기반이 되는 함수
+3. 람다 함수 앞에도 ALB가 있을 수 있음
+- IP Address
+1. 꼭 private IP여야 함
+- ALB는 여러 target group으로 라우팅할 수 있으므로 health check는 target group level에서 이루어짐
+
+[ALB Good to know]
+- CLB와 마찬가지로 ALB를 사용하는 경우에도 고정 호스트 이름이 부여
+- 애플리케이션 서버는 클라이언트의 IP를 직접 보지 못하며 클라이언트의 실제 IP는 X-Forwarded-For라고 불리는 헤더에 삽입
+- X-Forwarded-Port를 사용하는 포트와 X-Forwarded-Proto에 의해 사용되는 프로토콜도 얻게 됨
+- 즉, 클라이언트의 IP인 12.34.56.78이 로드 밸런서와 직접 통신하여 연결 종료 기능을 수행
+- 로드 밸런서가 EC2 인스턴스와 통신할 때 사설 IP인 로드 밸런서 IP를 사용해 EC2 인스턴스로 들어감
+- 그리고 EC2 인스턴스가 클라이언트 IP를 알기 위해서는 HTTP 요청에 있는 추가 헤더인 X-Forwarded-Port와 X-Forwarded-Proto를 확인해야 함

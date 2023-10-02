@@ -834,3 +834,23 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 2. ALB에서는 이름이 AWSALB
 3. CLB에서는 이름이 AWSELB
 4. 특정 기간을 기반으로 만료되며 그 기간이 로드 밸런서 자체에서 생성
+
+[ELB Cross Zone Load Balancing]
+- 두 개의 AZ, 한쪽에는 EC2 인스턴스 2개짜리 로드밸런서, 다른 한쪽은 8개짜리 로드밸런서가 있는 불균형한 상황을 가정
+- 클라이언트가 트래픽을 50%씩 두개의 AZ로 보냈다고 해도 10개의 EC2 인스턴스가 각각 10%씩 할당 받는 것이 Cross Zoen Load Balancing
+- Cross Zoen Load Balancing을 사용하지 않는다면 AZ1의 인스턴스 들은 25%씩 AZ2의 인스턴스 들은 6.25%씩 각 AZ 안에서 부하가 분산
+
+[로드 밸런서 별 Cross Zone Load Balancing]
+- ALB
+1. Cross Zone Load Balancing 활성화가 default
+2. 대상 그룹 설정에서 비활성화 가능
+3. 활성화가 default이므로 데이터를 다른 AZ로 옮기는 데 비용이 발생하지 않음
+
+- NLB & GWLB
+1. Cross Zone Load Balancing 비활성화가 default
+2. 활성화를 하려면 비용 발생
+3. AWS에서는 데이터를 다른 AZ로 옮길 때 비용을 지불해야 하므로
+
+- CLB
+1. Cross Zone Load Balancing 활성화가 default
+2. 활성화시켜도 AZ 간 데이터 이동에 비용이 들지 않음

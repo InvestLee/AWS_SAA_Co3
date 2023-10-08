@@ -1325,3 +1325,27 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 - Audit Logs(감사 로그)
 1. 감사 로그가 있어서 시간에 따라 RDS 및 오로라에서 어떤 쿼리가 생성되고 있고 DB를 확인하려면 감사 로그 작성을 활성화하면 됨
 2. 로그는 시간이 지나면 자동으로 삭제되며 장기간 보관하고 싶다면 AWS에 있는 CloudWatch Logs라는 전용 서비스로 전송해야함
+
+[아마존 RDS 프록시]
+- VPC 내에 RDS DB를 배포할 수 있음
+- 완전 관리형 RDS DB 프록시도 배포 가능
+- 아마존 RDS 프록시를 사용하면 애플리케이션이 DB 내에서 DB Connection 풀을 형성하고 공유 가능
+- 애플리케이션을 RDS DB 인스턴스에 일일이 연결하는 대신 프록시에 연결하면 프록시가 하나의 풀에 Connection을 모아 RDS DB 인스턴스로 가는 Connection이 줄어듬
+- ☆RDS DB 인스턴스에 Connection이 많은 경우 CPU와 RAM 등 DB 리소스의 부담을 줄여 DB 효율성을 향상시킬 수 있고 DB에 개방된 Connection과 시간 초과를 최소화할 수 있기 때문
+- RDS 프록시는 완전한 Serverless로 오토 스케일링이 가능해 용량을 관리할 필요가 없고 가용성이 높음
+- 다중 AZ도 지원
+- 가령 RDS DB 인스턴스에 장애 조치가 발생하면 기본 인스턴스가 아니라 대기 인스턴스로 실행되며 RDS 프록시 덕분에 RDS와 오로라의 장애 조치 시간을 66%까지 줄일 수 있음
+- 메인 RDS DB 인스턴스에 애플리케이션을 모두 연결하고 장애 조치를 각자 처리하게 하는 대신 장애 조치와 무관한 RDS 프록시에 연결하는 것
+- ☆RDS 프록시가 장애 조치가 발생한 RDS DB 인스턴스를 처리하므로 장애 조치 시간 개선
+- RDS 프록시는 MySQL, PostgreSQL, MariaDB용 RDS를 지원하며 MySQL, PostgreSQ용 오로라를 지원
+- 애플리케이션 코드를 변경하지 않아도 되고 RDS DB 인스턴스나 오로라 DB에 연결하는 대신 RDS 프록시에 연결하기만 하면 됨
+- RDS 프록시는 DB에 IAM 인증을 강제함으로써 IAM 인증을 통해서만 RDS DB 인스턴스에 연결하도록 할 수 있음
+- 이때 자격 증명은 AWS Secrets Manager 서비스에 안전하게 저장됨
+- RDS는 public access가 절대로 불가능
+- VPC 내에서만 엑세스할 수 있음
+- 인터넷을 통해 RDS 프록시에 연결할 수 없으니 보안이 휼륭함
+- RDS 프록시를 사용하면 코드 조각을 실행하는 Lambda 함수를 사용할 수 있음
+- Lambda 함수는 증식하며 여러 개가 생성되고 사라지는 속도가 매우 빠름
+- RDS DB 인스턴스에 수만 개의 Lambda 함수가 순식간에 발생했다 사라지며 Connection을 개방한다고 가정하면 개방된 Connection에 시간 초과가 발생하여 난장판됨
+- 따라서 RDS 프록시를 사용하여 Lambda 함수의 Connection 풀을 생성하면 Lambda 함수가 RDS 프록시를 오버로드함
+- RDS 프록시가 풀을 생성하면 RDS DB 인스턴스 Connection이 줄어 문제 해결 가능

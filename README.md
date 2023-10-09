@@ -1393,3 +1393,58 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 3. 멀티쓰레드 아키텍처
 4. Memcached에서는 여러 인스턴스가 모두 샤딩을 통해 작동
 5. Memcached는 분산되어 있는 순수한 캐시로 데이터가 손실되어도 괜찮은 경우
+
+[ElastiCache - Cache Security]
+- ElastiCache는 Redis에서만 IAM 인증을 지원하며, 나머지 경우 사용자 이름과 비밀번호를 사용
+- ElastiCache에서 IAM 정책을 정의하면 AWS API 수준 보안에만 사용
+
+- Redis AUTH
+1. Redis AUTH라는 Redis 내 보안을 통해 비밀번호와 토큰을 설정 가능
+2. Redis 클러스터를 만들 때, 캐시에 추가 보안 수준을 제공(보안 그룹에 추가)
+3. 또한 SSL 전송 중 암호화도 지원
+
+- Memcached
+1. SASL 기반 승인을 제공
+
+- 예를 들어 EC2 인스턴스와 클라이언트가 있는 경우 Redis AUTH를 사용하여 Redis 클러스터에 연결 가능
+- Redis 보안그룹에 의해 보호됨
+- 또한, 전송 중 암호화를 사용하거나, Redis에서 IAM 인증을 활용할 수 있음
+
+[ElastiCache에 데이터를 로드하는 패턴]
+- Lazy Loading(지연 로딩)
+1. 모든 데이터가 캐시되고 데이터가 캐시에서 지체될 수 있음
+2. 캐시 히트가 없는 경우에만 데이터를 Amazon ElastiCache에 로드하기 때문에 지연 로딩이라고 불림
+
+- Write Through
+1. DB에 데이터가 기록될 때마다 캐시에 데이터를 추가하거나 업데이트하는 것
+2. 데이터가 지체되지 않음
+
+- Session Store
+1. 유지 시간 기능(TTL)을 사용해 세션을 만료할 수 있음
+2. 임시 세션 데이터를 캐시에 저장
+
+[☆Elasti Cache - Redis Use Case]
+- 게이밍 리더보드 만들기
+- Redis에는 Sorted Sets가 있어서 고유성과 element 순서를 모두 보장
+- element가 추가될 때마다, 실시간으로 순위를 매긴 다음 올바른 order로 추가
+- Redis 클러스터가 있는 경우 실시간 리더보드를 만들 수 있음
+- 즉 실시간으로 1~3위 플레이어를 구할 수 있음
+- 모든 Redis 캐시는 동일한 리더보드 사용 가능
+- 즉, 클라이언트가 Redis를 사용하여 아마존 elasticache와 Communication할 때, 이 실시간 리더보드에 엑세스할 수 있으며, 애플리케이션 측에서 이 기능을 프로그래밍할 필요가 없음
+- Sorted Sets와 함께 Redis를 활용하여 실시간 리더보드에 엑세스 가능
+
+[포트 목록]
+- 중요한 포트
+1. FTP: 21
+2. SSH: 22
+3. SFTP: 22 (SSH와 같음)
+4. HTTP: 80
+5. HTTPS: 443
+
+- RDS 데이터베이스 포트
+1. PostgreSQL: 5432
+2. MySQL: 3306
+3. Oracle RDS: 1521
+4. MSSQL Server: 1433
+5. MariaDB: 3306 (MySQL과 같음)
+6. Aurora: 5432 (PostgreSQL와 호환될 경우) 또는 3306 (MySQL과 호환될 경우)

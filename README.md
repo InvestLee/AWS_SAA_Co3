@@ -1448,3 +1448,51 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 4. MSSQL Server: 1433
 5. MariaDB: 3306 (MySQL과 같음)
 6. Aurora: 5432 (PostgreSQL와 호환될 경우) 또는 3306 (MySQL과 호환될 경우)
+
+[DNS(Domain Name System)]
+- 사람에게 친숙한 호스트 이름을 대상 서버 IP주소로 번역해줌
+- 예를 들어, 웹 브라우저에 www.google.com을 입력하면 IP주소를 주고 웹 브라우저가 이면에서 여기에 접근하여 구글로부터 데이터를 얻음
+- DNS는 인터넷의 중추로 URL과 호스트 이름을 IP로 변환하는 것
+
+[DNS의 계층적 이름 구조]
+- .com
+- example.com
+- www.example.com or api.example.com
+
+[DNS 관련 용어]
+- Domain Registrar
+1. 도메인 이름을 등록하는 곳
+2. 예시로는 Amazon Route 53, GoDaddy 등
+3. 온라인에서 찾을 수 있는 다른 레지스트라들도 있음
+- DNS Records
+1. A, AAAA, CNAME, NS 등 여러 종류가 있음
+- Zone File
+1. 모든 DNS Record를 포함
+2. 호스트 이름과 IP 또는 주소를 일치시키는 방법
+- Name Server
+1. DNS 쿼리를 실제로 해결하는 서버
+- Top Level Domain(TLD)
+1. .com, .us, .in, .gov, .org 등
+- Second Level Domain(SLD)
+1. amazon.com, google.com 등
+- http://api.www.example.com.
+1. 마지막에 있는 .은 root
+2. .com은 TLD
+3. example.com이 2단계 도메인
+4. www.example.com이 서브 도메인
+5. api.www.example.com이 도메인 이름
+6. HTTP부분은 사용하기를 원하는 프로토콜
+7. 이 전체를 FQDN(Fully Qualified Domain Name)이라고 함
+
+[DNS 동작 방식]
+- 웹 서버(공인 IP : 9.10.11.12)에 도메인 이름을 example.com로 하여 접근하고 싶은 상황
+-  example.com이란 도메인 이름을 DNS용 서버를 등록해야 함
+- 웹 브라우저가 example.com에 접근하기 위해서 로컬 DNS 서버(서브도메인의 DNS 서버 / 최종 서버 / Domain Name Registrar에 의해 관리됨 / ex. 아마존 Route 53 등)에 질의함
+- 로컬 DNS 서버는 보통 회사에 의해 할당되고 관리되거나 인터넷 서비스 제공자에 동적으로 할당됨
+- 로컬 DNS 서버가 이 쿼리를 전에 본 적이 없다면 먼저 ICANN에 의해 관리된 DNS 서버의 root에 질의
+- root DNS 서버는 .com(Name Server 레코드 / IP : 1.2.3.4)로 응답
+- 로컬 DNS 서비스는 이제 IANA(Branch of ICANN)에 의해 관리되는 TLD DNS 서버(.com 도메인 서버 / IP : 1.2.3.4)에게 쿼리의 답을 요청
+- TLD DNS 서버는 example.com(Name Server 레코드 / IP : 5.6.7.8)로 응답
+- 이 과정을 SLD 등등에 계층적으로 실행하여 9.10.11.12 IP를 얻음
+- 이제 DNS 서버가 답을 알고 있으므로 바로 답변할 수 있음
+- 따라서 답변을 웹 브라우저에 보내고 브라우저는 답변을 받아 IP 주소를 이용하여 웹 서버에 접근할 수 있음

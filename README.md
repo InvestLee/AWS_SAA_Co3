@@ -1508,3 +1508,51 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 - 또한 Route 53의 리소스 관련 상태 확인을 할 수 있음
 - 100% SLA 가용성을 제공하는 유일한 AWS 서비스
 - 53은 DNS 서비스, 즉, 이름에서 사용되는 전통적인 DNS 포트
+
+[Route 53 - Records]
+- Route 53에서 여러 DNS 레코드를 정의하고 레코드를 통해 특정 도메인으로 라우팅하는 방법을 정의
+- Each record Contains
+1. Domain/subDomain Name : 예시) example.com
+2. Record Type : 예시) A, AAAA 
+3. Value : 예시) 123.456.789.123
+4. Routing Policy : Route 53이 쿼리에 응답하는 방식
+5. TTL(Time To Live) : DNS Resolver에서 레코드가 캐싱되는 시간
+- ☆Route 53에서 반드시 알아야 하는 Record Type : A, AAAA, CNAME, NS
+- 설정할 수 있는 고급 레코드 : CAA, DS, MX, NAPTR, PTR, SOA, TXT, SPF, SRV
+
+[Route 53 - Record Types]
+- A
+1. hostname과 IPv4 IP를 매핑
+2. 예를 들어 example.com은 1.2.3.4로 바로 연결
+
+- AAAA
+1. hostname과 IPv6 IP를 매핑
+
+- CNAME
+1. 호스트 이름을 다른 호스트 이름과 매핑
+2. 대상 호스트 이름은 A나 AAAA레코드가 될 수 있음
+3. Route 53에서 DNS Namespace 또는 Zone Apex의 상위 노드에 대한 CNAMES를 생성할 수 없음
+4. 예를 들어 example.com에 CNAME을 만들 수 없지만 www.example.com에 대한 CNAME 레코드는 만들 수 있음
+
+- NS
+1. Hosted Zone의 Name Server
+2. 서버의 DNS 이름 또는 IP 주소로 호스팅 존에 대한 DNS 쿼리에 응답할 수 있음
+3. 또한, 트래픽이 도메인으로 라우팅되는 방식을 제어
+
+[Route 53 - Hosted Zones]
+- 호스팅 존은 레코드의 컨테이너
+- 도메인과 서브도메인으로 가는 트래픽의 라우팅 방식을 정의
+
+- Public Hosted Zone
+1. 퍼블릭 도메인 이름을 살 때마다 mypublicdomain.com이 퍼블릭 도메인 이름이라면 퍼블릭 호스팅 존을 만들 수 있음
+2. 퍼블릭 존은 쿼리에 도메인 이름 application1.mypublicdomainname.com의 IP가 무엇인지 알 수 있음
+3. 공개된 클라이언트로부터 온 쿼리에 응답 가능
+
+- Private Hosted Zone
+1. 공개되지 않은 도메인 이름을 지원
+2. 가상 프라이빗 클라우드(VPC)만이 URL을 Resolve할 수 있음
+3. application1.company.internal와 같이 사기업에서 회사 네트워크 내에서만 접근할 수 있는 URL
+4. 비공개 URL이므로 비공개되어 있고 이면에는 Private DNS 레코드가 있음
+
+- AWS에서 만드는 어떤 호스팅 존이든 월에 50센트를 지불해야 함
+- Route 53은 무료가 아니며 도메인 이름을 등록하면 일 년에 최소 12달러를 지불해야 함

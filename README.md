@@ -1573,3 +1573,43 @@ i)그룹 당 수백 개의 EC2 인스턴스를 통해 확장가능하고 이를 
 - 그러므로 어떤 TTL 설정은 더 적합할지는 상황에 따라 달라짐
 - 예를 들어 TTL을 24시간으로 늦춘 다음 모든 클라이언트가 느린 새 TTL을 가지고 있다는 점을 확인한 후, 레코드 값을 바꿔서 모두에게 업데이트가 되면 TTL을 올리는 방식을 사용
 - TTL은 모든 레코드에 있어서 필수적이지만 별칭 레코드는 제외
+
+[CNAME vs Alias]
+- 로드 밸런서나 CloudFront 등 AWS의 리소스를 사용하는 경우 호스트 이름이 노출
+- 보유한 도메인에 호스트 이름을 매핑할 수 있음
+- 예를 들어 myapp.mydomain.com에 로드밸런서를 매핑하는 경우가 있음
+
+- CNAME
+1. 호스트 이름이 다른 호스트 이름으로 향하도록 할 수 있음
+2. myapp.mydomain.com이 blabla.anything.com으로 향하는 예시
+3. 루트 도메인 이름이 아닌 경우에만 가능해서 mydomain.com 앞에 뭔가 붙어야 함
+
+- ☆Alias(별칭)
+1. Route 53에 한정되어 있음
+2. 호스트 이름이 특정 AWS 리소스로 향하도록 할 수 있음
+3. 가령 app.mydomain.com이 blabla.amazonaws.com을 향할 수 있음
+4. root 및 root가 아닌 도메인 모두 작동
+5. mydomain.com을 별칭으로 사용하여 AWS 리소스로 향하도록 할 수 있기 때문에 아주 유용
+6. 무료이고 자체적으로 상태 확인 가능
+
+[Route 53 - Alias Records]
+- AWS의 리소스에만 매핑 가능
+- 예를 들어 Route 53에서 example.com을 A 레코드의 별칭 레코드로 하고 그 값은 로드 밸런서의 DNS 이름을 지정하려 한다고 가정
+- 이건 DNS의 확장 기능으로 모든 DNS에서 가능
+- 만약 기반 ALB에서 IP가 바뀌면 별칭 레코드는 이걸 바로 인식
+- CNAME과 달리, 별칭 레코드는 Zone Apex라는 DNS 네임스페이스의 상위 노드로 사용 가능
+- example.com에도 별칭 레코드 사용 가능
+- AWS 리소스를 위한 별칭 레코드의 타입은 항상 A 또는 AAAA인데 리소스는 IPv4나 IPv6중 하나
+- 별칭 레코드를 사용하면 TTL을 설정할 수 없음(Route 53에 의해 자동으로 설정)
+
+[Route 53 - Alias Records Targets]
+- ELB(Elastic Load Balancer)
+- ClouldFront Distributions
+- API Gateway
+- Elastic Beanstalk environments
+- S3 웹사이트(S3 버킷은 안됨 / 버킷들이 웹사이트로 활성화될 시 S3 웹사이트 가능)
+- VPC Interface Endpoints
+- Global Accelerator 가속기
+- 동일 호스트 존의 Route 53 레코드
+
+- ☆EC2 DNS 이름에 대해서는 별칭 레코드 설정 불가능!!
